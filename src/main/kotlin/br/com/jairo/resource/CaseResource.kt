@@ -1,7 +1,7 @@
 package br.com.jairo.resource
 
 import br.com.jairo.constant.CaseConstants
-import br.com.jairo.constant.CaseVisibility
+import br.com.jairo.constant.CaseAccess
 import br.com.jairo.entity.Case
 import br.com.jairo.resource.common.MultipartBody
 import br.com.jairo.service.CaseService
@@ -67,7 +67,7 @@ class CaseResource {
     @QueryParam(CaseConstants.TITLE) title: String? = null,
     @QueryParam(CaseConstants.DESCRIPTION) description: String? = null,
     @QueryParam(CaseConstants.CREATED) created: String? = null,
-    @QueryParam(CaseConstants.VISIBILITY) visibility: CaseVisibility? = null,
+    @QueryParam(CaseConstants.VISIBILITY) access: CaseAccess? = null,
     @QueryParam(CaseConstants.TAGS) tags: List<String> = emptyList(),
     @QueryParam(CaseConstants.CLIENTS) clients: List<String> = emptyList(),
     @QueryParam("offset") offset: Int = 0,
@@ -80,7 +80,7 @@ class CaseResource {
     includeParam(queryParams, CaseConstants.TITLE, title)
     includeParam(queryParams, CaseConstants.DESCRIPTION, description)
     includeParam(queryParams, CaseConstants.CREATED, created)
-    includeParam(queryParams, CaseConstants.VISIBILITY, visibility)
+    includeParam(queryParams, CaseConstants.VISIBILITY, access)
     includeParam(queryParams, CaseConstants.TAGS, if (tags.isEmpty()) null else tags)
     includeParam(queryParams, CaseConstants.CLIENTS, if (clients.isEmpty()) null else clients)
     return service.filter(queryParams, offset, if (limit == 0) 100 else limit, order, dir)

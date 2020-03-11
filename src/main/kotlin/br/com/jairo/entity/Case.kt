@@ -1,6 +1,6 @@
 package br.com.jairo.entity
 
-import br.com.jairo.constant.CaseVisibility
+import br.com.jairo.constant.CaseAccess
 import com.google.cloud.datastore.BaseEntity
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.FullEntity
@@ -23,7 +23,7 @@ data class Case(
   val notes: String = "",
   @field:NotEmpty(message = "The responsible is required")
   val responsible: String = "",
-  val visibility: CaseVisibility = CaseVisibility.PUBLIC,
+  val access: CaseAccess = CaseAccess.PUBLIC,
   @field:NotNull(message = "Creation date required")
   val created: Date = Date()
 ) : DatastoreEntity() {
@@ -46,7 +46,7 @@ data class Case(
       .set(::notes.name, toStringValue(notes))
       .set(::responsible.name, toStringValue(responsible))
       .set(::created.name, toTimestamp(created))
-      .set(::visibility.name, visibility.name)
+      .set(::access.name, access.name)
       .build()
   }
 

@@ -1,0 +1,4 @@
+runtime: java11
+instance_class: F1
+service: backend
+entrypoint: 'java -Xmx64m -Dquarkus.http.port=$PORT -jar ./target/case-backend-1.0-SNAPSHOT-runner.jar'

@@ -12,10 +12,21 @@ abstract class AbstractRepository {
 
   private final val credentialsPath: String = ConfigProvider.getConfig().getValue("google.cloud.credentials.path", String::class.java)
 
-  private final val googleCredentials: GoogleCredentials = GoogleCredentials.fromStream(FileInputStream(credentialsPath))
-    .createScoped(arrayListOf("https://www.googleapis.com/auth/cloud-platform"))
+  final val store: Datastore
 
-  final val store: Datastore = DatastoreOptions.newBuilder().setCredentials(googleCredentials).build().service
+  constructor() {
+    store = try {
+      val inputStream = FileInputStream(credentialsPath)
+      val googleCredentials = GoogleCredentials.fromStream(inputStream)
+        .createScoped(arrayListOf("https://www.googleapis.com/auth/cloud-platform"))
+      DatastoreOptions.newBuilder()
+        .setCredentials(googleCredentials)
+        .build().service
+    } catch (ex: Exception) {
+      println("Get Google Engine Credentials from Compute Engine")
+      DatastoreOptions.getDefaultInstance().service
+    }
+  }
 
 
 }

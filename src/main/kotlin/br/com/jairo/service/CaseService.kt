@@ -1,6 +1,6 @@
 package br.com.jairo.service
 
-import br.com.jairo.constant.CaseVisibility
+import br.com.jairo.constant.CaseAccess
 import br.com.jairo.entity.Case
 import br.com.jairo.repository.CaseRepository
 import java.io.BufferedReader
@@ -59,7 +59,7 @@ class CaseService {
       description = getFromMap<String>(payload, Case::description.name) ?: case.description,
       notes = getFromMap<String>(payload, Case::notes.name) ?: case.notes,
       responsible = getFromMap<String>(payload, Case::responsible.name) ?: case.responsible,
-      visibility = getFromMap<CaseVisibility>(payload, Case::visibility.name) ?: case.visibility,
+      access = getFromMap<CaseAccess>(payload, Case::access.name) ?: case.access,
       created = getFromMap<Date>(payload, Case::created.name) ?: case.created
     )
     return repository.update(updated)
@@ -82,10 +82,10 @@ class CaseService {
     return list[idx].trim()
   }
 
-  fun getVisibilityEnum(idx: Int, list: List<String>) : CaseVisibility {
+  fun getVisibilityEnum(idx: Int, list: List<String>) : CaseAccess {
     if (list.size < idx + 1)
-      return CaseVisibility.PUBLIC
-    return CaseVisibility.valueOf(list[idx])
+      return CaseAccess.PUBLIC
+    return CaseAccess.valueOf(list[idx])
   }
 
   fun getDate(idx: Int, list: List<String>) : Date {
@@ -110,7 +110,7 @@ class CaseService {
       description = getString(4, values),
       notes = getString(5, values),
       responsible = getString(6, values),
-      visibility = getVisibilityEnum(7, values),
+      access = getVisibilityEnum(7, values),
       created = getDate(8, values)
     )
   }

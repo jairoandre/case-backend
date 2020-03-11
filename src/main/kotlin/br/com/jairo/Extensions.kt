@@ -1,6 +1,6 @@
 package br.com.jairo
 
-import br.com.jairo.constant.CaseVisibility
+import br.com.jairo.constant.CaseAccess
 import br.com.jairo.entity.Case
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Value
@@ -26,5 +26,5 @@ fun Entity.toCase(): Case =
     notes = getStringIfExists(Case::notes.name),
     responsible = getStringIfExists(Case::responsible.name),
     created = getTimeStampIfExists(Case::created.name),
-    visibility = CaseVisibility.valueOf(getStringIfExists(Case::visibility.name, "PUBLIC"))
+    access = CaseAccess.valueOf(getStringIfExists(Case::access.name, "PUBLIC"))
   )
