@@ -4,27 +4,43 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
+You can see the live demo of this project on this link: [https://stuffs.appspot.com](https://stuffs.appspot.com)
+
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
 ```
-./mvnw quarkus:dev
+./mvnw compile quarkus:dev
 ```
 
-## Packaging and running the application
+This project use the Google Cloud Datastore as database, so you need to have a Datastore (not Firebase) configured and the Account Service key (JSON file) for access it.
 
-The application is packageable using `./mvnw package`.
-It produces the executable `case-backend-1.0-SNAPSHOT-runner.jar` file in `/target` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/lib` directory.
+You need to pass the path of the credential JSON file before run the application:
 
-The application is now runnable using `java -jar target/case-backend-1.0-SNAPSHOT-runner.jar`.
+```
+export GOOGLE_CLOUD_CREDENTIALS_PATH=/path/to/the/credential.json
+```
 
-## Creating a native executable
+## Build the application
 
-You can create a native executable using: `./mvnw package -Pnative`.
+```
+./mvnw compile quarkus:build
+```
 
-Or you can use Docker to build the native executable using: `./mvnw package -Pnative -Dquarkus.native.container-build=true`.
+### Google App Engine
 
-You can then execute your binary: `./target/case-backend-1.0-SNAPSHOT-runner`
+To deploy the app on the Google App Engine:
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/building-native-image-guide .
+```
+gcloud app deploy
+```
+
+You need to configure the "dispatch.yaml" file so the frontend project can access the backend:
+
+```
+gcloud app deploy dispatch.yaml
+```
+
+On Google App Engine there is no need to pass the credentials json file.
+
+
