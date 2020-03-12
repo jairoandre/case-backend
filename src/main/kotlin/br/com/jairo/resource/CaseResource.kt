@@ -1,7 +1,7 @@
 package br.com.jairo.resource
 
-import br.com.jairo.constant.CaseConstants
 import br.com.jairo.constant.CaseAccess
+import br.com.jairo.constant.CaseConstants
 import br.com.jairo.entity.Case
 import br.com.jairo.resource.common.MultipartBody
 import br.com.jairo.service.CaseService
@@ -24,6 +24,13 @@ class CaseResource {
   @Produces(MediaType.APPLICATION_JSON)
   fun get(@PathParam("id") id: Long) : Case {
     return service.getById(id)
+  }
+
+  @DELETE
+  @Path("/{id}")
+  @Produces(MediaType.TEXT_PLAIN)
+  fun delete(@PathParam("id") id: Long) : String {
+    return service.delete(id).toString()
   }
 
   @POST

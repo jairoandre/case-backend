@@ -74,6 +74,16 @@ class CaseRepository: AbstractRepository() {
     return case.copy(id = entity.key.id)
   }
 
+  fun delete(id: Long) : Boolean {
+    try {
+      store.delete(keyFactory.newKey(id))
+      return true
+    } catch (ex: Exception) {
+      println(ex)
+    }
+    return false
+  }
+
   fun getById(id: Long) : Case? {
     val queryBuilder = createQueryBuilder()
     queryBuilder.setFilter(StructuredQuery.PropertyFilter.eq("__key__", keyFactory.newKey(id)))

@@ -8,6 +8,7 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.function.Consumer
 import javax.enterprise.context.ApplicationScoped
@@ -33,15 +34,32 @@ class CaseService {
 
   fun save(case: Case) = repository.save(case)
 
-  private fun <T> getFromMap(map: Map<String, Any>, property: String)  : T? {
+  private fun <T> convertFromMap(map: Map<String, Any>, property: String)  : T? {
     val value = map[property] ?:
       return null
     return value as T
   }
 
+  private fun convertMapValueToAccessEnum(map: Map<String, Any>, property: String) : CaseAccess? {
+    val value = map[property] ?:
+      return null
+    return CaseAccess.valueOf(value as String)
+  }
+
+  private fun convertMapValueToDate(map: Map<String, Any>, property: String) : Date? {
+    val value = map[property] ?:
+      return null
+    // Because this come from the web
+    return isoStringToDate(value as String)
+  }
+
   fun getById(id: Long) : Case {
     return repository.getById(id) ?:
       throw NotFoundException("Case not found for id [$id]")
+  }
+
+  fun delete(id: Long) : Boolean {
+    return repository.delete(id)
   }
 
   fun update(payload: Map<String, Any>) : Case {
@@ -52,15 +70,15 @@ class CaseService {
     val case = getById(id as Long)
 
     val updated = case.copy(
-      folder = getFromMap<String>(payload, Case::folder.name) ?: case.folder,
-      title = getFromMap<String>(payload, Case::title.name) ?: case.title,
-      clients = getFromMap<List<String>>(payload, Case::title.name) ?: case.clients,
-      tags = getFromMap<List<String>>(payload, Case::tags.name) ?: case.tags,
-      description = getFromMap<String>(payload, Case::description.name) ?: case.description,
-      notes = getFromMap<String>(payload, Case::notes.name) ?: case.notes,
-      responsible = getFromMap<String>(payload, Case::responsible.name) ?: case.responsible,
-      access = getFromMap<CaseAccess>(payload, Case::access.name) ?: case.access,
-      created = getFromMap<Date>(payload, Case::created.name) ?: case.created
+      folder = convertFromMap<String>(payload, Case::folder.name) ?: case.folder,
+      title = convertFromMap<String>(payload, Case::title.name) ?: case.title,
+      clients = convertFromMap<List<String>>(payload, Case::clients.name) ?: case.clients,
+      tags = convertFromMap<List<String>>(payload, Case::tags.name) ?: case.tags,
+      description = convertFromMap<String>(payload, Case::description.name) ?: case.description,
+      notes = convertFromMap<String>(payload, Case::notes.name) ?: case.notes,
+      responsible = convertFromMap<String>(payload, Case::responsible.name) ?: case.responsible,
+      access = convertMapValueToAccessEnum(payload, Case::access.name) ?: case.access,
+      created = convertMapValueToDate(payload, Case::created.name) ?: case.created
     )
     return repository.update(updated)
   }
@@ -82,21 +100,30 @@ class CaseService {
     return list[idx].trim()
   }
 
-  fun getVisibilityEnum(idx: Int, list: List<String>) : CaseAccess {
+  fun getAccessEnum(idx: Int, list: List<String>) : CaseAccess {
     if (list.size < idx + 1)
       return CaseAccess.PUBLIC
     return CaseAccess.valueOf(list[idx])
   }
 
-  fun getDate(idx: Int, list: List<String>) : Date {
-    if (list.size < idx + 1)
-      return Date()
-    val localDate = LocalDate.parse(list[idx].trim())
+  private fun stringToDate(string: String) : Date {
+    val localDate = LocalDate.parse(string.trim())
     return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
   }
 
+  private fun isoStringToDate(string: String) : Date {
+    val localDate = LocalDate.parse(string.trim(), DateTimeFormatter.ISO_DATE_TIME)
+    return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+  }
+
+  fun getDate(idx: Int, list: List<String>) : Date {
+    if (list.size < idx + 1)
+      return Date()
+    return stringToDate(list[idx].trim())
+  }
+
   fun importLine(line: String) : Case? {
-    val regex = """"\[[,\s\w']+\]"|[^,][\w"-]+"""".toRegex()
+    val regex = """"[^;]+"""".toRegex()
     val matchResult = regex.findAll(line)
     val values = mutableListOf<String>()
     matchResult.iterator().forEachRemaining(Consumer { values.add(it.value.replace("\"","").trim()) })
@@ -110,7 +137,7 @@ class CaseService {
       description = getString(4, values),
       notes = getString(5, values),
       responsible = getString(6, values),
-      access = getVisibilityEnum(7, values),
+      access = getAccessEnum(7, values),
       created = getDate(8, values)
     )
   }
