@@ -60,12 +60,21 @@ class CaseRepository: AbstractRepository() {
     val query: Query<Entity> = queryBuilder.build()
     try {
       val queryResult = store.run(query)
-      queryResult.iterator().forEachRemaining() { resultList.add(it.toCase()) }
+      queryResult.iterator().forEachRemaining { resultList.add(it.toCase()) }
     } catch (ex: Exception) {
       println(ex)
     }
 
     return resultList
+  }
+
+  /**
+   * Save a list of cases on the storage
+   */
+  fun saveList(list: List<Case>): List<Case> {
+    val entities = list.map { it.toEntity(keyFactory.newKey()) }
+    val result = store.put(*entities.toTypedArray())
+    return result.map { it.toCase() }
   }
 
   fun save(case: Case): Case {

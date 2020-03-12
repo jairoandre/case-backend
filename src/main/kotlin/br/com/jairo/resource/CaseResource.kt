@@ -44,9 +44,9 @@ class CaseResource {
   @Path("/batch")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Produces(MediaType.APPLICATION_JSON)
-  fun batch(@MultipartForm data: MultipartBody) : Map<Int, Case> {
+  fun batch(@MultipartForm data: MultipartBody) : List<Case> {
     if (data.file == null)
-      return emptyMap()
+      return emptyList()
     return service.batchCaseCreation(data.file)
   }
 

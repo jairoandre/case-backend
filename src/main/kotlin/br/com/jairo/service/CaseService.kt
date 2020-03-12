@@ -142,25 +142,31 @@ class CaseService {
     )
   }
 
-  fun batchCaseCreation(inputStream: InputStream) : Map<Int, Case> {
-    val mutableMap = mutableMapOf<Int, Case>()
+  fun batchCaseCreation(inputStream: InputStream) : List<Case> {
     try {
       val reader = BufferedReader(InputStreamReader(inputStream))
       var lineCount = 0
+      var mutableList = mutableListOf<Case>()
+      var resultList = mutableListOf<Case>()
       while (reader.ready()) {
         val line = reader.readLine()
         val case = importLine(line)
         if (case == null)
           lineCount++
         else {
-          mutableMap[lineCount++] = repository.save(case)
+          mutableList.add(case)
+          if (lineCount % 100 == 0) {
+            val cases = repository.saveList(mutableList)
+            resultList.addAll(cases)
+            mutableList.clear()
+          }
         }
       }
       reader.close()
-      return mutableMap
+      return mutableList
     } catch (ex: Exception) {
       println("Error reading input stream: ${ex.message}")
     }
-    return emptyMap();
+    return emptyList()
   }
 }
