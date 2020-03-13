@@ -44,3 +44,9 @@ gcloud app deploy dispatch.yaml
 On Google App Engine there is no need to pass the credentials json file.
 
 
+## TODO:
+
+- Write unit tests
+- Asynchronous data import
+
+
